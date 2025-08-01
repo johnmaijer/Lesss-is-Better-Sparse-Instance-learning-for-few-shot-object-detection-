@@ -159,15 +159,19 @@ class Trainer(DefaultTrainer):
         res = cls.test(cfg, model, evaluators)
         res = OrderedDict({k + "_TTA": v for k, v in res.items()})
         return res
-    
+
 def setup(args):
     """
     Create configs and perform basic setups.
-    """  
+    """
+
     cfg = get_cfg()
     cfg.DE.CACHE_MODEL_KEYS = ""
     cfg.DE.CACHE_MODEL_VALUES = ""
-    cfg.TEST.DETECTIONS_PER_IMAGE = 100
+    cfg.DE.INSTANCE_SPARSE = 0.2
+    cfg.DE.QUERY_SPARSE = 0.5
+    cfg.DE.PROTO_TEMP = 0.01
+    cfg.MODEL.RPN.DROPOUT_PROB = 0.2
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.DE.CONTROLLER = args.controller
@@ -176,7 +180,6 @@ def setup(args):
     default_setup(cfg, args)
     print(cfg.DATASETS.TEST)
     return cfg
-
 
 def main(args):
     cfg = setup(args)
